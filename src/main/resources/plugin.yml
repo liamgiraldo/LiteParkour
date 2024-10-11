@@ -1,0 +1,4 @@
+name: LiteParkour
+version: '1.0-SNAPSHOT'
+main: me.liamgiraldo.liteParkour.LiteParkour
+api-version: '1.18'
