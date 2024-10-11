@@ -10,8 +10,13 @@ public final class LiteParkour extends JavaPlugin {
     public void onEnable() {
         System.out.println("LiteParkour enabled");
         // Plugin startup logic
+
+        //set command for the parkour creator
+
         parkourController = new ParkourController(this);
         parkourCreator = new ParkourCreator(this, parkourController);
+
+        getCommand("parkour").setExecutor(parkourCreator);
 
         registerEvents();
     }

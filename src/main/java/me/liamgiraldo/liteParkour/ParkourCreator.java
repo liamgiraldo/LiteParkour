@@ -11,6 +11,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class ParkourCreator implements Listener, CommandExecutor {
     private LiteParkour liteParkour;
@@ -21,7 +22,6 @@ public class ParkourCreator implements Listener, CommandExecutor {
     private String parkourName;
 
     public ParkourCreator(LiteParkour liteParkour, ParkourController parkourController) {
-        liteParkour.getCommand("parkour").setExecutor(this);
         this.liteParkour = liteParkour;
         this.parkourController = parkourController;
     }
@@ -29,10 +29,11 @@ public class ParkourCreator implements Listener, CommandExecutor {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if(sender instanceof Player){
             Player player = (Player)sender;
+            player.sendMessage(Arrays.toString(args));
             if(args.length > 0) {
                 if(args[0].equalsIgnoreCase("create")) {
+
                     if(commandUser == null) {
-                        commandUser = player;
                         startParkourCreation(player);
                         return true;
                     }
