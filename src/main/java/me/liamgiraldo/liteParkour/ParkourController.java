@@ -1,5 +1,8 @@
 package me.liamgiraldo.liteParkour;
 import org.bukkit.Location;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -8,13 +11,15 @@ import org.bukkit.event.player.PlayerMoveEvent;
 
 import java.util.ArrayList;
 
-public class ParkourController implements Listener {
+public class ParkourController implements Listener, CommandExecutor {
     private LiteParkour liteParkour;
     private ArrayList<ParkourModel> parkours = new ArrayList<ParkourModel>();
     public ParkourController(LiteParkour liteParkour) {
         this.liteParkour = liteParkour;
         parkours = loadParkours(liteParkour);
     }
+
+
 
     private ArrayList<ParkourModel> loadParkours(LiteParkour liteParkour) {
         // Load parkours from file
@@ -81,6 +86,8 @@ public class ParkourController implements Listener {
             for(int i = 0; i < parkour.getCheckpoints().size(); i++) {
                 config.set("parkours." + parkour.getName() + ".checkpoints." + i, parkour.getCheckpoints().get(i).getBlockX() + "," + parkour.getCheckpoints().get(i).getBlockY() + "," + parkour.getCheckpoints().get(i).getBlockZ());
             }
+
+            liteParkour.saveConfig();
         }
         else{
             System.out.println("Parkour " + parkour.getName() + " not found in config");
@@ -123,12 +130,31 @@ public class ParkourController implements Listener {
         return false;
     }
 
+    private ParkourModel getPlayerParkour(Player player) {
+        for(ParkourModel parkour: parkours) {
+            if(parkour.getPlayers().contains(player)) {
+                return parkour;
+            }
+        }
+        return null;
+    }
+
+    private boolean isPlayerInThisParkour(Player player, ParkourModel parkour) {
+        return parkour.getPlayers().contains(player);
+    }
+
     @EventHandler
     private void onPlayerTouchStart(PlayerMoveEvent e) {
         //check if the player touches a start checkpoint, and assign them to that parkour
         for(ParkourModel parkour: parkours) {
             if(e.getTo().getBlock().getLocation().equals(parkour.getStart())) {
                 Player player = e.getPlayer();
+                //if the player is in the same parkour, don't add them again
+                if(isPlayerInThisParkour(player, parkour)) {
+                    //you would also want to restart the player's progress in the parkour, but that hasn't been implemented
+                    //TODO: restart player's progress in parkour
+                    return;
+                }
                 removePlayerFromParkour(player);
                 addPlayerToParkour(player, parkour);
             }
@@ -140,10 +166,23 @@ public class ParkourController implements Listener {
         //check if the player touches an end checkpoint, and remove them from that parkour
         for(ParkourModel parkour: parkours) {
             if(e.getTo().getBlock().getLocation().equals(parkour.getEnd())) {
-                Player player = e.getPlayer();
-                player.sendMessage("You completed the " + parkour.getName() + " parkour!");
-                removePlayerFromParkour(player);
+                if(parkour.getPlayers().contains(e.getPlayer())) {
+                    e.getPlayer().sendMessage("You completed the " + parkour.getName() + " parkour!");
+                    removePlayerFromParkour(e.getPlayer());
+                }
             }
+        }
+    }
+
+    @Override
+    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        if(sender instanceof Player){
+            Player player = (Player) sender;
+            //the available commands are
+            // /parkour leave - leave the parkour you are in
+            // /parkour list - list all parkours
+            // /parkour restart - restart the parkour you are in
+            // /parkour 
         }
     }
 }

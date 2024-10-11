@@ -9,6 +9,11 @@ public final class LiteParkour extends JavaPlugin {
     @Override
     public void onEnable() {
         System.out.println("LiteParkour enabled");
+
+        saveDefaultConfig();
+        TimeConfig.setup();
+        TimeConfig.get().options().copyDefaults(true);
+        TimeConfig.save();
         // Plugin startup logic
 
         //set command for the parkour creator
