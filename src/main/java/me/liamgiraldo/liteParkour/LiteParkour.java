@@ -1,5 +1,6 @@
 package me.liamgiraldo.liteParkour;
 
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class LiteParkour extends JavaPlugin {
@@ -34,5 +35,9 @@ public final class LiteParkour extends JavaPlugin {
     @Override
     public void onDisable() {
         // Plugin shutdown logic
+    }
+
+    public FileConfiguration getTimeConfig() {
+        return TimeConfig.get();
     }
 }
